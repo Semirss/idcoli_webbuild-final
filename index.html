@@ -187,7 +187,50 @@
       <div id="unity-warning"></div>
     </div>
 
-
+<script>
+  // =========== FORCE CACHE CLEAR ON FIRST LOAD ===========
+  (function() {
+    const FORCE_CLEAR_KEY = 'force_cleared_v4';
+    const shouldForceClear = !localStorage.getItem(FORCE_CLEAR_KEY);
+    
+    if (shouldForceClear) {
+      console.log('Performing force cache clear...');
+      
+      // Clear all storage
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Clear all caches
+      if ('caches' in window) {
+        caches.keys().then(cacheNames => {
+          cacheNames.forEach(cacheName => {
+            caches.delete(cacheName);
+            console.log('Force deleted cache:', cacheName);
+          });
+        });
+      }
+      
+      // Unregister all service workers
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+          registrations.forEach(registration => {
+            registration.unregister();
+            console.log('Force unregistered service worker');
+          });
+        });
+      }
+      
+      // Mark as cleared
+      localStorage.setItem(FORCE_CLEAR_KEY, 'true');
+      
+      // Reload the page
+      setTimeout(() => {
+        window.location.reload(true);
+      }, 500);
+      return; // Stop execution
+    }
+  })();
+</script>
     <script>
       // =========== VERSION CONTROL AND CACHE MANAGEMENT ===========
       const GAME_VERSION = "4"; // <-- CHANGE THIS WITH EACH BUILD!
