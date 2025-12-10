@@ -3,22 +3,190 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unity Web Player | I,dcoli</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
-    <link rel="stylesheet" href="TemplateData/style.css">
-    <link rel="manifest" href="manifest.webmanifest">
+    
+    <!-- Google Fonts for a modern look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Added Titan One for the bubbly logo look -->
+    <link href="https://fonts.googleapis.com/css2?family=Titan+One&family=Rajdhani:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+      :root {
+        /* Palette based on the provided image */
+        --bg-deep: #1a0515;       /* Very dark purple/black */
+        --bg-organic: #4a0e2e;    /* Deep fleshy magenta */
+        --accent-pink: #ff00cc;   /* Bright neon pink */
+        --accent-purple: #8b2fc9; /* Rich purple */
+        --accent-blue: #6d9eeb;   /* Light blue for text highlights */
+        --text-color: #fce7f3;    /* Pale pinkish white */
+        --container-bg: rgba(40, 10, 30, 0.85); /* Semi-transparent dark plum */
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--bg-deep);
+        /* Complex gradient to mimic the organic/cellular background */
+        background-image: 
+          radial-gradient(circle at 20% 30%, var(--bg-organic) 0%, transparent 50%),
+          radial-gradient(circle at 80% 70%, var(--accent-purple) 0%, transparent 60%),
+          radial-gradient(circle at 50% 50%, #2d0a1e 0%, var(--bg-deep) 100%);
+        font-family: 'Inter', sans-serif;
+        color: var(--text-color);
+        height: 100vh;
+        width: 100vw;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+      }
+
+      /* The Main Container */
+      #unity-container {
+        position: relative;
+        width: 100%;
+        max-width: 960px;
+        aspect-ratio: 16/10;
+        background: var(--container-bg);
+        /* Pink/Purple Glow */
+        box-shadow: 0 0 40px rgba(139, 47, 201, 0.4), 0 0 100px rgba(255, 0, 204, 0.1);
+        border-radius: 20px;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 2px solid rgba(255, 0, 204, 0.2);
+      }
+
+      /* The Canvas */
+      #unity-canvas {
+        width: 100%;
+        height: 100%;
+        background: #000;
+        display: block;
+        outline: none;
+      }
+
+      /* Loading Bar Overlay */
+      #unity-loading-bar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--container-bg);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        backdrop-filter: blur(8px);
+      }
+
+      /* Logo Area */
+      #unity-logo {
+        width: 150px;
+        height: 150px;
+        /* Kept the image logic, but styled the fallback heavily */
+        background: url('TemplateData/logo.png') no-repeat center center;
+        background-size: contain;
+        margin-bottom: 2rem;
+        position: relative;
+      }
+      
+      /* Styled to match the "IDCOLI" reference text */
+      #unity-logo:empty::after {
+        content: "IDCOLI";
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        font-family: 'Titan One', cursive; /* Bubbly font */
+        font-size: 3.5rem;
+        letter-spacing: 2px;
+        
+        /* Gradient Text Fill (Blue/Purple/White like reference) */
+        background: linear-gradient(180deg, #ffffff 0%, #6d9eeb 20%, #8b2fc9 60%, #4a0e2e 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        
+        /* Text Stroke/Outline Simulation */
+        -webkit-text-stroke: 1.5px white; 
+        
+        /* Drop Shadow to pop from background */
+        filter: drop-shadow(0px 0px 10px var(--accent-pink));
+      }
+
+      /* Progress Bar Container */
+      #unity-progress-bar-empty {
+        width: 240px;
+        height: 12px;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        overflow: hidden;
+        position: relative;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+      }
+
+      /* Actual Progress Fill */
+      #unity-progress-bar-full {
+        width: 0%;
+        height: 100%;
+        /* Pink to Purple Gradient */
+        background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink));
+        box-shadow: 0 0 15px var(--accent-pink);
+        border-radius: 20px;
+        transition: width 0.2s ease-out;
+      }
+
+      /* Warning Banner */
+      #unity-warning {
+        position: absolute;
+        left: 50%;
+        top: 5%;
+        transform: translate(-50%, 0);
+        background: rgba(220, 38, 38, 0.9);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-align: center;
+        display: none;
+        z-index: 20;
+        font-weight: 600;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      }
+
+      /* Fullscreen helper for mobile */
+      @media (max-width: 960px) {
+        #unity-container {
+          width: 100%;
+          height: 100%;
+          border-radius: 0;
+          border: none;
+        }
+      }
+    </style>
   </head>
   <body>
     <div id="unity-container">
       <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
+      
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
         <div id="unity-progress-bar-empty">
           <div id="unity-progress-bar-full"></div>
         </div>
       </div>
-      <div id="unity-warning"> </div>
+      
+      <div id="unity-warning"></div>
     </div>
+
     <script>
       window.addEventListener("load", function () {
         if ("serviceWorker" in navigator) {
@@ -45,9 +213,9 @@
         var div = document.createElement('div');
         div.innerHTML = msg;
         warningBanner.appendChild(div);
-        if (type == 'error') div.style = 'background: red; padding: 10px;';
+        if (type == 'error') div.style = 'background: #dc2626; padding: 10px; border-radius: 4px;';
         else {
-          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+          if (type == 'warning') div.style = 'background: #ca8a04; padding: 10px; border-radius: 4px;';
           setTimeout(function() {
             warningBanner.removeChild(div);
             updateBannerVisibility();
@@ -59,29 +227,15 @@
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/idcoli_webbuild.loader.js";
       var config = {
-        arguments: [],
         dataUrl: buildUrl + "/idcoli_webbuild.data.unityweb",
         frameworkUrl: buildUrl + "/idcoli_webbuild.framework.js.unityweb",
         codeUrl: buildUrl + "/idcoli_webbuild.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "efuyegela",
         productName: "I,dcoli",
-        productVersion: "2.0",
+        productVersion: "3",
         showBanner: unityShowBanner,
-        // errorHandler: function(err, url, line) {
-        //    alert("error " + err + " occurred at line " + line);
-        //    // Return 'true' if you handled this error and don't want Unity
-        //    // to process it further, 'false' otherwise.
-        //    return true;
-        // },
       };
-
-      // By default Unity keeps WebGL canvas render target size matched with
-      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
-      // Set this to false if you want to decouple this synchronization from
-      // happening inside the engine, and you would instead like to size up
-      // the canvas DOM size and WebGL render target sizes yourself.
-      // config.matchWebGLToCanvasSize = false;
 
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         // Mobile device style: fill the whole browser client area with the game canvas:
@@ -91,8 +245,7 @@
         document.getElementsByTagName('head')[0].appendChild(meta);
       }
 
-
-      loadingBar.style.display = "block";
+      loadingBar.style.display = "flex"; // Changed from block to flex for centering
 
       var script = document.createElement("script");
       script.src = loaderUrl;
