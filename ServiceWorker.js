@@ -1,4 +1,4 @@
-const cacheName = "efuyegela-I,dcoli-3";
+const cacheName = "efuyegela-I,dcoli-5";
 const contentToCache = [
     "Build/idcoli_webbuild.loader.js",
     "Build/idcoli_webbuild.framework.js.unityweb",
